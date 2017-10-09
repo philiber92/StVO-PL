@@ -20,6 +20,8 @@
 *****************************************************************************/
 
 #include <iomanip>
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 #include <mrpt/opengl.h>
@@ -99,6 +101,7 @@ private:
     opengl::CEllipsoidPtr       elliObj;
     opengl::CSetOfLinesPtr      lineObj;
     opengl::CPointCloudPtr      pointObj;
+    std::ofstream               trajFile;
 
     //CPointsMapPtr pointsObj;
 
@@ -126,4 +129,3 @@ private:
     float           b, sigmaP, sigmaL, f, cx, cy, bsigmaL, bsigmaP;
 
 };
-

@@ -63,6 +63,8 @@ sceneRepresentation::sceneRepresentation(){
     hasPoints       = false;
     hasFrustum      = false;
 
+    trajFile.open ("trajectory.txt");
+
 }
 
 sceneRepresentation::sceneRepresentation(string configFile){
@@ -302,7 +304,7 @@ bool sceneRepresentation::updateScene(){
         float b_ = v_auxgt(4);
         float c_ = v_auxgt(5);
         v_auxgt(1) =  z_;
-        v_auxgt(2) = -y_;        
+        v_auxgt(2) = -y_;
         v_auxgt(4) = -c_;
         v_auxgt(5) =  b_;
         pose_gt = TPose3D(v_auxgt(0),v_auxgt(1),v_auxgt(2),v_auxgt(3),v_auxgt(4),v_auxgt(5));
@@ -376,7 +378,7 @@ bool sceneRepresentation::updateScene(){
     win->repaint();
 
     // Key events   -       TODO: change the trick to employ viewports
-    if(win->keyHit()){       
+    if(win->keyHit()){
         key = win->getPushedKey(&kmods);
         if(key == MRPTK_SPACE){                     // Space    Reset VO
             theScene->clear();
@@ -490,7 +492,7 @@ bool sceneRepresentation::updateScene(){
                 elliObj->setScale(selli);
         }
         else if ( (key == 105) || (key == 73) ){    // I        image
-            hasImg   = !hasImg;          
+            hasImg   = !hasImg;
             if(isKitti){
                 if(hasImg)
                     image->setViewportPosition(20, 20, 621, 188);
@@ -587,6 +589,21 @@ bool sceneRepresentation::updateScene( list<PointFeature*> matched_pt ){
 
     // Update the text
     if(hasText){
+        CVectorDouble trajData;
+        pose.getAsVector(trajData);
+        trajFile << std::fixed << std::setprecision(8) << trajData[0];
+        trajFile << " ";
+        trajFile << std::fixed << std::setprecision(8) << trajData[1];
+        trajFile << " ";
+        trajFile << std::fixed << std::setprecision(8) << trajData[2];
+        trajFile << " ";
+        trajFile << std::fixed << std::setprecision(8) << trajData[3];
+        trajFile << " ";
+        trajFile << std::fixed << std::setprecision(8) << trajData[4];
+        trajFile << " ";
+        trajFile << std::fixed << std::setprecision(8) << trajData[5];
+        trajFile << std::endl;
+
         string text = "Frame: \t \t" + to_string(frame) + " \n" + "Frequency: \t" + to_string_with_precision(1000.f/time,4) + " Hz \n" + "Lines:  \t" + to_string(nLines) + " (" + to_string(nLinesH) + ") \nPoints: \t" + to_string(nPoints) + " (" + to_string(nPointsH) + ")";
         win->addTextMessage(0.85,0.95, text, TColorf(.0,.0,.0), 0, mrpt::opengl::MRPT_GLUT_BITMAP_HELVETICA_10 );
     }
@@ -795,7 +812,7 @@ void sceneRepresentation::plotPointsCovariances(){
         covP_an(2,1) = covP_an(1,2);
         covP_an << covP_an * bsigmaP / (disp2*disp2);
         // Insertion of the ellipsoids
-        CEllipsoidPtr elliAux_ = opengl::CEllipsoid::Create();        
+        CEllipsoidPtr elliAux_ = opengl::CEllipsoid::Create();
         elliAux_->setQuantiles(1.0);
         elliAux_->enableDrawSolid3D(true);
         elliAux_->setCovMatrix(getCovFormat(covP_an));
@@ -1052,4 +1069,3 @@ bool sceneRepresentation::getPose(Matrix4d &T){
         }
     }
 }
-
